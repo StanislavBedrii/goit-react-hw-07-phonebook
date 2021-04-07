@@ -1,31 +1,48 @@
-import React, { Suspense, lazy } from 'react';
-import { Route, NavLink, Switch } from 'react-router-dom';
-import routes from './routes';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// import FeedbackOptions from './components/FeedbackOptions';
-// import Statistics from './components/Statistics';
-// import Section from './components/Section';
-// import Notification from './components/Notification';
-// import Container from './components/Container';
+import { getContacts, getLoader } from './redux/contacts/contacts-selectors';
+import { fetchContacts } from './redux/contacts/contacts-operations';
+import Container from './components/Container';
+import ContactForm from './components/ContactForm';
+import Filter from './components/Filter';
+import ContactList from './components/ContactList';
+import NumberContacts from './components/NumberContacts';
 
-// const HomeView = lazy(() =>
-//   import('./views/HomeView.js' /* webpackChunkName: "home-view" */),
-// );
+import './App.css';
 
-// const App = () => (
-//   <>
-//     <AppBar />
+function App() {
+  const contacts = useSelector(getContacts);
+  const loader = useSelector(getLoader);
+  const dispatch = useDispatch();
 
-//     <Suspense fallback={<h1>Загружаем...</h1>}>
-//       <Switch>
-//         <Route exact path={routes.home} component={HomeView} />
-//         <Route path={routes.authors} component={AuthorsView} />
-//         <Route exact path={routes.books} component={BooksView} />
-//         <Route path={routes.bookDetails} component={BookDetailsView} />
-//         <Route component={NotFoundView} />
-//       </Switch>
-//     </Suspense>
-//   </>
-// );
+  useEffect(() => dispatch(fetchContacts()), [dispatch]);
 
-// export default App;
+  return (
+    <div className="App">
+      <Container>
+        <h1 className="main__title">Phonebook</h1>
+        <ContactForm />
+
+        {contacts.length > 0 ? (
+          <div>
+            <h2 className="section__title">Contacts</h2>
+            <Filter />
+            <ContactList />
+            <NumberContacts />
+          </div>
+        ) : (
+          <p>PHONE BOOK IS EMPTY</p>
+        )}
+
+        {loader && <p>Loading...</p>}
+
+        <ToastContainer autoClose={3000} />
+      </Container>
+    </div>
+  );
+}
+
+export default App;
